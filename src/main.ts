@@ -1,44 +1,35 @@
+import { Asteroid, Ship } from './types.ts';
+
+import {
+  FPS,
+  FRICTION,
+  GAME_LIVES,
+  LASER_DIST,
+  LASER_EXPLODE_DUR,
+  LASER_MAX,
+  LASER_SPD,
+  ROIDS_JAG,
+  ROID_PTS_LGE,
+  ROID_PTS_MED,
+  ROID_PTS_SML,
+  ROIDS_NUM,
+  ROIDS_SIZE,
+  ROIDS_SPD,
+  ROIDS_VERT,
+  SAVE_KEY_SCORE,
+  SHIP_EXPLODE_DUR,
+  SHIP_BLINK_DUR,
+  SHIP_INV_DUR,
+  SHIP_SIZE,
+  SHIP_THRUST,
+  TURN_SPEED,
+  SHOW_BOUNDING,
+  SHOW_CENTRE_DOT,
+  TEXT_FADE_TIME,
+  TEXT_SIZE,
+} from './constants.ts';
+
 import './style.css';
-
-type Roid = {
-  x: number;
-  y: number;
-  xv: number;
-  yv: number;
-  r: number;
-  a: number;
-  vert: number;
-  offs: number[];
-};
-
-const FPS = 120; // frames per second
-const FRICTION = 0.7; // friction coefficient of space :) (0 = no friction, 1 = lots of friction)
-const GAME_LIVES = 3; // starting number of lives
-const LASER_DIST = 0.6; // max distance laser can travel as fraction of screen width
-const LASER_EXPLODE_DUR = 0.1; // duration of the lasers' explosions
-const LASER_MAX = 10; // maximum number of lasers on screet at once
-const LASER_SPD = 500; // speed of lasers in pixels per second
-const ROIDS_JAG = 0.4; // jaggedness of the asteroids (0 = 1, 1 = lots)
-const ROID_PTS_LGE = 20; // points scored for a large asteroid
-const ROID_PTS_MED = 50; // points scored for a medium asteroid
-const ROID_PTS_SML = 100; // points scored for a small asteroid
-const ROIDS_NUM = 1; // starting number of asteroids
-const ROIDS_SIZE = 100; // starting size of asteroids in pixels
-const ROIDS_SPD = 50; // max starting speed of asteroids in pixels per second
-const ROIDS_VERT = 10; // average number of vertices on each asteroid
-const SAVE_KEY_SCORE = 'highscore'; // save key for local storage of highscore
-const SHIP_EXPLODE_DUR = 0.3; // duration of the ship's explosions
-const SHIP_BLINK_DUR = 0.1; // duration of the ship's blink during invisibility in seconds
-const SHIP_INV_DUR = 3; // duration of ship's invisibility in seconds
-const SHIP_SIZE = 20; // ship height in pixels
-const SHIP_THRUST = 5; // acceleration of the ship in pixels per second per second
-const TURN_SPEED = 360; // turn speed in degrees per second
-const SHOW_BOUNDING = false; // show or hide collision bounding
-const SHOW_CENTRE_DOT = false; // show or hide ship's centre dot
-// const SOUND_ON = false; //
-// const MUSIN_ON = false;
-const TEXT_FADE_TIME = 2.5; // text fade time in seconds
-const TEXT_SIZE = 40; // text font height in pixels
 
 const cvs = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
 cvs.style.width = window.innerWidth - 50 + 'px';
@@ -52,31 +43,10 @@ const ctx = cvs.getContext('2d') as CanvasRenderingContext2D;
 // set up the game parameters
 let level: number;
 let lives: number;
-let roids: Roid[];
+let roids: Asteroid[];
 let score: number;
 let scoreHigh: number;
-let ship: {
-  x: number;
-  y: number;
-  r: number;
-  a: number;
-  blinkNum: number;
-  blinkTime: number;
-  canShoot: boolean;
-  dead: boolean;
-  explodeTime: number;
-  lasers: {
-    x: number;
-    y: number;
-    xv: number;
-    yv: number;
-    dist: number;
-    explodeTime: number;
-  }[];
-  rot: number;
-  thrust: { x: number; y: number };
-  thrusting: boolean;
-};
+let ship: Ship;
 let text: string;
 let textAlpha: number;
 
@@ -131,10 +101,6 @@ function destroyAsteroid(index: number) {
   // destroy the asteroid
   roids.splice(index, 1);
 
-  // calculate the ratio of remaining asteroids to determine music tempo
-  // roidsLeft--;
-  // music.setAsteroidRatio(roidsLeft == 0 ? 1 : roidsLeft / roidsTotal);
-
   // new level when no more asteroids
   if (roids.length == 0) {
     level++;
@@ -171,7 +137,6 @@ function drawShip(x: number, y: number, a: number, colour = 'white') {
 
 function explodeShip() {
   ship.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * FPS);
-  // fxExplode.play();
 }
 
 function gameOver() {
@@ -180,22 +145,22 @@ function gameOver() {
   textAlpha = 1.0;
 }
 
-function keyDown(ev: KeyboardEvent) {
+function keyDown(event: KeyboardEvent) {
   if (ship.dead) {
     return;
   }
 
-  switch (ev.keyCode) {
-    case 32: // space bar (shoot laser)
+  switch (event.code) {
+    case 'Space':
       shootLaser();
       break;
-    case 37: // left arrow (rotating left)
+    case 'ArrowLeft':
       ship.rot = ((TURN_SPEED / 180) * Math.PI) / FPS;
       break;
-    case 38: // up arrow (thrust the ship forward)
+    case 'ArrowUp':
       ship.thrusting = true;
       break;
-    case 39: // right arrow
+    case 'ArrowRight':
       ship.rot = ((-TURN_SPEED / 180) * Math.PI) / FPS;
       break;
   }
@@ -206,17 +171,17 @@ function keyUp(ev: KeyboardEvent) {
     return;
   }
 
-  switch (ev.keyCode) {
-    case 32: // space bar (allow shooting again)
+  switch (ev.code) {
+    case 'Space':
       ship.canShoot = true;
       break;
-    case 37: // left arrow (stop retating left)
+    case 'ArrowLeft':
       ship.rot = 0;
       break;
-    case 38: // up arrow (stop thrusting)
+    case 'ArrowUp':
       ship.thrusting = false;
       break;
-    case 39: // right arrow (stop retating right)
+    case 'ArrowRight':
       ship.rot = 0;
       break;
   }
@@ -225,7 +190,7 @@ function keyUp(ev: KeyboardEvent) {
 function newAsteroid(x: number, y: number, r: number) {
   const lvlMult = 1 + 0.1 * level;
 
-  const roid: Roid = {
+  const roid: Asteroid = {
     x: x,
     y: y,
     xv:
@@ -314,11 +279,6 @@ function shootLaser() {
 function update() {
   const blinkOn = ship.blinkNum % 2 == 0;
   const exploding = ship.explodeTime > 0;
-
-  // console.log(typeof textAlpha);
-
-  // play the music
-  // music.tick();
 
   // draw space
   ctx.fillStyle = 'black';
