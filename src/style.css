@@ -7,6 +7,13 @@
   box-sizing: border-box;
 }
 
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .asteroids-canvas {
   border: 1px solid black;
 }
