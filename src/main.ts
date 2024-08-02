@@ -9,4 +9,4 @@ canvas.height = canvas.offsetHeight - 50;
 
 const context = canvas.getContext('2d');
 
-context.fillRect(20, 0, 100, 100);
+context.fillRect(20, 0, 100, 100)
