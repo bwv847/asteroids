@@ -3,8 +3,6 @@ import {
   GAME_LIVES,
   LASER_DIST,
   LASER_EXPLODE_DUR,
-  LASER_MAX,
-  LASER_SPD,
   ASTEROIDS_JAGGEDNESS,
   ASTEROID_POINTS_LARGE,
   ASTEROID_POINTS_MEDIUM,
@@ -19,7 +17,6 @@ import {
   SHIP_INV_DUR,
   SHIP_SIZE,
   SHIP_THRUST,
-  TURN_SPEED,
   SHOW_BOUNDING,
   SHOW_CENTRE_DOT,
   TEXT_FADE_TIME,
@@ -30,6 +27,7 @@ import './style.css';
 import { distBetweenPoints } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
 import { Asteroid, AsteroidInterface } from './Asteroid.ts';
+import { keyDown, keyUp } from './keyboard.ts';
 
 const canvas = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
 canvas.style.width = window.innerWidth - 50 + 'px';
@@ -56,8 +54,10 @@ let deltaTime = 0.008;
 newGame();
 
 // set up event handlers
-document.addEventListener('keydown', keyDown);
-document.addEventListener('keyup', keyUp);
+document.addEventListener('keydown', (event) =>
+  keyDown(event, ship, deltaTime)
+);
+document.addEventListener('keyup', (event) => keyUp(event, ship));
 const $togglePause = document.getElementById('togglePause');
 
 if ($togglePause) {
@@ -91,7 +91,7 @@ function draw(currentTime: number) {
   requestAnimationId = window.requestAnimationFrame(draw);
 }
 
-function togglePause() {
+const togglePause = () => {
   isPause = !isPause;
 
   if (isPause) {
@@ -99,7 +99,7 @@ function togglePause() {
   } else {
     window.requestAnimationFrame(draw);
   }
-}
+};
 
 function createAsteroidBelt() {
   const asteroids = [];
@@ -132,7 +132,7 @@ function createAsteroidBelt() {
   return asteroids;
 }
 
-function destroyAsteroid(index: number) {
+const destroyAsteroid = (index: number) => {
   const x = asteroids[index].x;
   const y = asteroids[index].y;
   const r = asteroids[index].r;
@@ -208,55 +208,13 @@ function destroyAsteroid(index: number) {
     level++;
     newLevel();
   }
-}
+};
 
-function gameOver() {
+const gameOver = () => {
   ship.dead = true;
   text = 'Game Over';
   textAlpha = 1.0;
-}
-
-function keyDown(event: KeyboardEvent) {
-  if (ship.dead) {
-    return;
-  }
-
-  switch (event.code) {
-    case 'Space':
-      ship.shootLaser(LASER_SPD, LASER_MAX);
-      break;
-    case 'ArrowLeft':
-      ship.rot = (TURN_SPEED / 180) * Math.PI * deltaTime;
-      break;
-    case 'ArrowUp':
-      ship.thrusting = true;
-      break;
-    case 'ArrowRight':
-      ship.rot = (-TURN_SPEED / 180) * Math.PI * deltaTime;
-      break;
-  }
-}
-
-function keyUp(ev: KeyboardEvent) {
-  if (ship.dead) {
-    return;
-  }
-
-  switch (ev.code) {
-    case 'Space':
-      ship.canShoot = true;
-      break;
-    case 'ArrowLeft':
-      ship.rot = 0;
-      break;
-    case 'ArrowUp':
-      ship.thrusting = false;
-      break;
-    case 'ArrowRight':
-      ship.rot = 0;
-      break;
-  }
-}
+};
 
 function newGame() {
   level = 0;
