@@ -1,7 +1,6 @@
 import { Asteroid, Ship } from './types.ts';
 
 import {
-  FPS,
   FRICTION,
   GAME_LIVES,
   LASER_DIST,
@@ -51,6 +50,7 @@ let ship: Ship;
 let text: string;
 let textAlpha: number;
 
+let deltaTime = 0.008;
 newGame();
 
 // set up event handlers
@@ -58,12 +58,23 @@ document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
 
 // set up the game loop
-setInterval(update, 1000 / FPS);
+window.requestAnimationFrame(draw);
+let lastTime = 0;
+function draw(currentTime: number) {
+  if (lastTime === 0) {
+    lastTime = currentTime;
+  }
+
+  deltaTime = (currentTime - lastTime) / 1000;
+  lastTime = currentTime;
+
+  update();
+  window.requestAnimationFrame(draw);
+}
 
 function createAsteroidBelt() {
   roids = [];
-  // roidsTotal = ROID_NUM  + level * 7;
-  // roidsLeft = roidsTotal;
+
   let x, y;
   for (let i = 0; i < ROIDS_NUM + level; i++) {
     // random asteroid location (not touching spaceship)
@@ -71,6 +82,7 @@ function createAsteroidBelt() {
       x = Math.floor(Math.random() * cvs.width);
       y = Math.floor(Math.random() * cvs.height);
     } while (distBetweenPoints(ship.x, ship.y, x, y) < ROIDS_SIZE * 2 + ship.r);
+
     roids.push(newAsteroid(x, y, Math.ceil(ROIDS_SIZE / 2)));
   }
 }
@@ -133,7 +145,7 @@ function drawShip(x: number, y: number, a: number, colour = 'black') {
 }
 
 function explodeShip() {
-  ship.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * FPS);
+  ship.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * deltaTime);
 }
 
 function gameOver() {
@@ -152,13 +164,13 @@ function keyDown(event: KeyboardEvent) {
       shootLaser();
       break;
     case 'ArrowLeft':
-      ship.rot = ((TURN_SPEED / 180) * Math.PI) / FPS;
+      ship.rot = (TURN_SPEED / 180) * Math.PI * deltaTime;
       break;
     case 'ArrowUp':
       ship.thrusting = true;
       break;
     case 'ArrowRight':
-      ship.rot = ((-TURN_SPEED / 180) * Math.PI) / FPS;
+      ship.rot = (-TURN_SPEED / 180) * Math.PI * deltaTime;
       break;
   }
 }
@@ -191,10 +203,16 @@ function newAsteroid(x: number, y: number, r: number) {
     x: x,
     y: y,
     xv:
-      ((Math.random() * ROIDS_SPD * lvlMult) / FPS) *
+      Math.random() *
+      ROIDS_SPD *
+      lvlMult *
+      deltaTime *
       (Math.random() < 0.5 ? 1 : -1),
     yv:
-      ((Math.random() * ROIDS_SPD * lvlMult) / FPS) *
+      Math.random() *
+      ROIDS_SPD *
+      lvlMult *
+      deltaTime *
       (Math.random() < 0.5 ? 1 : -1),
     r: r,
     a: Math.random() * Math.PI * 2, // in radians
@@ -240,7 +258,7 @@ function newShip() {
     r: SHIP_SIZE,
     a: (90 / 180) * Math.PI, // convert to radians
     blinkNum: Math.ceil(SHIP_INV_DUR / SHIP_BLINK_DUR),
-    blinkTime: Math.ceil(SHIP_BLINK_DUR * FPS),
+    blinkTime: Math.ceil(SHIP_BLINK_DUR / deltaTime),
     canShoot: true,
     dead: false,
     explodeTime: 0,
@@ -261,12 +279,14 @@ function shootLaser() {
       // from the nose of the ship
       x: ship.x + (4 / 3) * ship.r * Math.cos(ship.a),
       y: ship.y - (4 / 3) * ship.r * Math.sin(ship.a),
-      xv: (LASER_SPD * Math.cos(ship.a)) / FPS,
-      yv: (-LASER_SPD * Math.sin(ship.a)) / FPS,
+      // TODO: multiplying by 0.008 is a dirty fix
+      // when multiplying by deltaTime, some lasers are
+      // super slow
+      xv: LASER_SPD * Math.cos(ship.a) * 0.008,
+      yv: -LASER_SPD * Math.sin(ship.a) * 0.008,
       dist: 0,
       explodeTime: 0,
     });
-    // fxLaser.play();
   }
 
   // prevent further shooting
@@ -283,8 +303,8 @@ function update() {
 
   // thrust the ship
   if (ship.thrusting && !ship.dead) {
-    ship.thrust.x += (SHIP_THRUST * Math.cos(ship.a)) / FPS;
-    ship.thrust.y -= (SHIP_THRUST * Math.sin(ship.a)) / FPS;
+    ship.thrust.x += SHIP_THRUST * Math.cos(ship.a) * deltaTime;
+    ship.thrust.y -= SHIP_THRUST * Math.sin(ship.a) * deltaTime;
     // fxThrust.play();
 
     // draw the thruster
@@ -315,8 +335,8 @@ function update() {
     }
   } else {
     // apply friction (slow the ship down when not thrusting)
-    ship.thrust.x -= (FRICTION * ship.thrust.x) / FPS;
-    ship.thrust.y -= (FRICTION * ship.thrust.y) / FPS;
+    ship.thrust.x -= FRICTION * ship.thrust.x * deltaTime;
+    ship.thrust.y -= FRICTION * ship.thrust.y * deltaTime;
     // fxThrust.stop();
   }
 
@@ -333,7 +353,7 @@ function update() {
 
       // reduce the blink num
       if (ship.blinkTime == 0) {
-        ship.blinkTime = Math.ceil(SHIP_BLINK_DUR * FPS);
+        ship.blinkTime = Math.ceil(SHIP_BLINK_DUR / deltaTime);
         ship.blinkNum--;
       }
     }
@@ -471,7 +491,7 @@ function update() {
     ctx.fillStyle = 'rgba(0, 0, 0, ' + textAlpha + ')';
     ctx.font = 'small-caps ' + TEXT_SIZE + 'px sans-serif';
     ctx.fillText(text, cvs.width / 2, cvs.height * 0.75);
-    textAlpha -= 1.0 / TEXT_FADE_TIME / FPS;
+    textAlpha -= (1.0 / TEXT_FADE_TIME) * deltaTime;
   }
 
   // draw the lives
@@ -522,7 +542,7 @@ function update() {
       ) {
         // remove the asteroid and active the laser explosion
         destroyAsteroid(i);
-        ship.lasers[j].explodeTime = Math.ceil(LASER_EXPLODE_DUR * FPS);
+        ship.lasers[j].explodeTime = Math.ceil(LASER_EXPLODE_DUR * deltaTime);
         break;
       }
     }

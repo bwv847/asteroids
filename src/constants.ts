@@ -1,4 +1,3 @@
-export const FPS = 120; // frames per second
 export const FRICTION = 0.7; // friction coefficient of space :) (0 = no friction, 1 = lots of friction)
 export const GAME_LIVES = 3; // starting number of lives
 export const LASER_DIST = 0.6; // max distance laser can travel as fraction of screen width
