@@ -112,7 +112,7 @@ function distBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
-function drawShip(x: number, y: number, a: number, colour = 'white') {
+function drawShip(x: number, y: number, a: number, colour = 'black') {
   ctx.strokeStyle = colour;
   ctx.lineWidth = SHIP_SIZE / 20;
   ctx.beginPath();
@@ -281,7 +281,7 @@ function update() {
   const exploding = ship.explodeTime > 0;
 
   // draw space
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, cvs.width, cvs.height);
 
   // thrust the ship
@@ -292,8 +292,8 @@ function update() {
 
     // draw the thruster
     if (!exploding && blinkOn) {
-      ctx.strokeStyle = '#fff'; // flame color
-      ctx.fillStyle = '#000'; // flame color
+      ctx.strokeStyle = 'black'; // flame color
+      ctx.fillStyle = 'lightblue'; // flame color
       ctx.lineWidth = SHIP_SIZE / 15;
       ctx.beginPath();
       ctx.moveTo(
@@ -378,7 +378,7 @@ function update() {
   // draw the asteroids
   let x, y, r, a, vert, offs;
   for (let i = 0; i < roids.length; i++) {
-    ctx.strokeStyle = 'white';
+    ctx.strokeStyle = 'black';
     ctx.lineWidth = SHIP_SIZE / 20;
     // get the asteroid properties
     x = roids[i].x;
@@ -418,7 +418,7 @@ function update() {
   // draw the lasers
   for (let i = 0; i < ship.lasers.length; i++) {
     if (ship.lasers[i].explodeTime == 0) {
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = 'rgb(255, 140, 0)';
       ctx.beginPath();
       ctx.arc(
         ship.lasers[i].x,
@@ -471,8 +471,8 @@ function update() {
   if (textAlpha >= 0) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'rgba(255, 255, 255, ' + textAlpha + ')';
-    ctx.font = 'small-caps ' + TEXT_SIZE + 'px dejavu sans mono';
+    ctx.fillStyle = 'rgba(0, 0, 0, ' + textAlpha + ')';
+    ctx.font = 'small-caps ' + TEXT_SIZE + 'px sans-serif';
     ctx.fillText(text, cvs.width / 2, cvs.height * 0.75);
     textAlpha -= 1.0 / TEXT_FADE_TIME / FPS;
   }
@@ -480,7 +480,7 @@ function update() {
   // draw the lives
   let lifeColour;
   for (let i = 0; i < lives; i++) {
-    lifeColour = exploding && i == lives - 1 ? 'red' : 'white';
+    lifeColour = exploding && i == lives - 1 ? 'red' : 'black';
     drawShip(
       15 + SHIP_SIZE + i * SHIP_SIZE * 2.3,
       SHIP_SIZE + 15,
@@ -492,15 +492,15 @@ function update() {
   // draw the score
   ctx.textAlign = 'right';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#fff';
-  ctx.font = TEXT_SIZE + 'px dejavu sans mono';
+  ctx.fillStyle = '#000';
+  ctx.font = TEXT_SIZE + 'px sans-serif';
   ctx.fillText(String(score), cvs.width - SHIP_SIZE / 2, SHIP_SIZE + 10);
 
   // draw the high score
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#fff';
-  ctx.font = TEXT_SIZE * 0.75 + 'px dejavu sans mono';
+  ctx.fillStyle = '#000';
+  ctx.font = TEXT_SIZE * 0.75 + 'px sans-serif';
   ctx.fillText('Best ' + scoreHigh, cvs.width / 2, SHIP_SIZE + 10);
 
   // detect laser hits on asteroids
