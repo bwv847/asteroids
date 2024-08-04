@@ -30,6 +30,7 @@ import {
 } from './constants.ts';
 
 import './style.css';
+import { distBetweenPoints } from './utils.ts';
 
 const cvs = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
 cvs.style.width = window.innerWidth - 50 + 'px';
@@ -106,10 +107,6 @@ function destroyAsteroid(index: number) {
     level++;
     newLevel();
   }
-}
-
-function distBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
-  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
 function drawShip(x: number, y: number, a: number, colour = 'black') {
