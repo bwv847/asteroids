@@ -23,6 +23,7 @@ export type ShipInterface = {
     colour: string
   ) => void;
   explode: (duration: number, deltaTime: number) => void;
+  shootLaser: (speed: number, quantityLimit: number) => void;
 };
 
 export class Ship implements ShipInterface {
@@ -93,5 +94,25 @@ export class Ship implements ShipInterface {
 
   explode(duration: number, deltaTime: number) {
     this.explodeTime = Math.ceil(duration * deltaTime);
+  }
+
+  // LASER_SPD, LASER_MAX
+  shootLaser(speed: number, quantityLimit: number) {
+    if (this.canShoot && this.lasers.length < quantityLimit) {
+      this.lasers.push({
+        x: this.x + (4 / 3) * this.r * Math.cos(this.a),
+        y: this.y - (4 / 3) * this.r * Math.sin(this.a),
+        // TODO: multiplying by 0.008 is a dirty fix
+        // when multiplying by deltaTime, some lasers are
+        // super slow
+        xv: speed * Math.cos(this.a) * 0.008,
+        yv: -speed * Math.sin(this.a) * 0.008,
+        dist: 0,
+        explodeTime: 0,
+      });
+    }
+
+    // prevent further shooting
+    this.canShoot = false;
   }
 }

@@ -218,7 +218,7 @@ function keyDown(event: KeyboardEvent) {
 
   switch (event.code) {
     case 'Space':
-      shootLaser();
+      ship.shootLaser(LASER_SPD, LASER_MAX);
       break;
     case 'ArrowLeft':
       ship.rot = (TURN_SPEED / 180) * Math.PI * deltaTime;
@@ -277,27 +277,6 @@ function newLevel() {
 }
 
 // TODO: make degrees to radians util
-
-function shootLaser() {
-  // create the laser object
-  if (ship.canShoot && ship.lasers.length < LASER_MAX) {
-    ship.lasers.push({
-      // from the nose of the ship
-      x: ship.x + (4 / 3) * ship.r * Math.cos(ship.a),
-      y: ship.y - (4 / 3) * ship.r * Math.sin(ship.a),
-      // TODO: multiplying by 0.008 is a dirty fix
-      // when multiplying by deltaTime, some lasers are
-      // super slow
-      xv: LASER_SPD * Math.cos(ship.a) * 0.008,
-      yv: -LASER_SPD * Math.sin(ship.a) * 0.008,
-      dist: 0,
-      explodeTime: 0,
-    });
-  }
-
-  // prevent further shooting
-  ship.canShoot = false;
-}
 
 function update() {
   const blinkOn = ship.blinkNum % 2 === 0;
