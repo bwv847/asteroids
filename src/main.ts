@@ -205,29 +205,6 @@ function destroyAsteroid(index: number) {
   }
 }
 
-function drawShip(x: number, y: number, a: number, colour = 'black') {
-  ctx.strokeStyle = colour;
-  ctx.lineWidth = SHIP_SIZE / 20;
-  ctx.beginPath();
-  ctx.moveTo(
-    // nose of the ship
-    x + (4 / 3) * ship.r * Math.cos(a),
-    y - (4 / 3) * ship.r * Math.sin(a)
-  );
-  ctx.lineTo(
-    // rear left
-    x - ship.r * ((2 / 3) * Math.cos(a) + Math.sin(a)),
-    y + ship.r * ((2 / 3) * Math.sin(a) - Math.cos(a))
-  );
-  ctx.lineTo(
-    // rear right
-    x - ship.r * ((2 / 3) * Math.cos(a) - Math.sin(a)),
-    y + ship.r * ((2 / 3) * Math.sin(a) + Math.cos(a))
-  );
-  ctx.closePath();
-  ctx.stroke();
-}
-
 function explodeShip() {
   ship.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * deltaTime);
 }
@@ -376,7 +353,7 @@ function update() {
   // draw the triangular ship
   if (!exploding) {
     if (blinkOn && !ship.dead) {
-      drawShip(ship.x, ship.y, ship.a);
+      ship.draw(ship.x, ship.y, ship.a, ctx, 'black');
     }
 
     // handle blinking
@@ -531,10 +508,11 @@ function update() {
   let lifeColour;
   for (let i = 0; i < lives; i++) {
     lifeColour = exploding && i == lives - 1 ? 'red' : 'black';
-    drawShip(
+    ship.draw(
       15 + SHIP_SIZE + i * SHIP_SIZE * 2.3,
       SHIP_SIZE + 15,
       0.5 * Math.PI,
+      ctx,
       lifeColour
     );
   }
