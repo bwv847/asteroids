@@ -25,31 +25,31 @@ export class Asteroid implements AsteroidInterface {
     y: number,
     r: number,
     speed: number,
-    verticiesAverage: number,
+    verticesAverage: number,
     jaggedness: number,
     level: number,
     deltaTime: number
   ) {
-    const lvlMult = 1 + 0.1 * level;
+    const levelMultiplier = 1 + 0.1 * level;
 
     this.x = x;
     this.y = y;
     this.xv =
       Math.random() *
       speed *
-      lvlMult *
+      levelMultiplier *
       deltaTime *
       (Math.random() < 0.5 ? 1 : -1);
     this.yv =
       Math.random() *
       speed *
-      lvlMult *
+      levelMultiplier *
       deltaTime *
       (Math.random() < 0.5 ? 1 : -1);
     this.r = r;
     this.a = Math.random() * Math.PI * 2; // in radians
     this.vert = Math.floor(
-      Math.random() * (verticiesAverage + 1) + verticiesAverage / 2
+      Math.random() * (verticesAverage + 1) + verticesAverage / 2
     );
     this.offs = [];
 

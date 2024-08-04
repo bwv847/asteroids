@@ -5,14 +5,14 @@ import {
   LASER_EXPLODE_DUR,
   LASER_MAX,
   LASER_SPD,
-  ROIDS_JAG,
-  ROID_PTS_LGE,
-  ROID_PTS_MED,
-  ROID_PTS_SML,
-  ROIDS_NUM,
-  ROIDS_SIZE,
-  ROIDS_SPD,
-  ROIDS_VERT,
+  ASTEROIDS_JAGGEDNESS,
+  ASTEROID_POINTS_LARGE,
+  ASTEROID_POINTS_MEDIUM,
+  ASTEROID_POINTS_SMALL,
+  ASTEROIDS_STARTING_NUMBER,
+  ASTEROIDS_STARTING_SIZE,
+  ASTEROIDS_STARTING_MAX_SPEED,
+  ASTEROID_AVERAGE_VERTICES,
   SAVE_KEY_SCORE,
   SHIP_EXPLODE_DUR,
   SHIP_BLINK_DUR,
@@ -102,31 +102,34 @@ function togglePause() {
 }
 
 function createAsteroidBelt() {
-  const roids = [];
+  const asteroids = [];
 
   let x, y;
-  for (let i = 0; i < ROIDS_NUM + level; i++) {
+  for (let i = 0; i < ASTEROIDS_STARTING_NUMBER + level; i++) {
     // random asteroid location (not touching spaceship)
     do {
       x = Math.floor(Math.random() * canvas.width);
       y = Math.floor(Math.random() * canvas.height);
-    } while (distBetweenPoints(ship.x, ship.y, x, y) < ROIDS_SIZE * 2 + ship.r);
+    } while (
+      distBetweenPoints(ship.x, ship.y, x, y) <
+      ASTEROIDS_STARTING_SIZE * 2 + ship.r
+    );
 
-    roids.push(
+    asteroids.push(
       new Asteroid(
         x,
         y,
-        Math.ceil(ROIDS_SIZE / 2),
-        ROIDS_SPD,
-        ROIDS_VERT,
-        ROIDS_JAG,
+        Math.ceil(ASTEROIDS_STARTING_SIZE / 2),
+        ASTEROIDS_STARTING_MAX_SPEED,
+        ASTEROID_AVERAGE_VERTICES,
+        ASTEROIDS_JAGGEDNESS,
         level,
         deltaTime
       )
     );
   }
 
-  return roids;
+  return asteroids;
 }
 
 function destroyAsteroid(index: number) {
@@ -135,15 +138,15 @@ function destroyAsteroid(index: number) {
   const r = asteroids[index].r;
 
   // split the asteroid in two if necessary
-  if (r === Math.ceil(ROIDS_SIZE / 2)) {
+  if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 2)) {
     asteroids.push(
       new Asteroid(
         x,
         y,
-        Math.ceil(ROIDS_SIZE / 4),
-        ROIDS_SPD,
-        ROIDS_VERT,
-        ROIDS_JAG,
+        Math.ceil(ASTEROIDS_STARTING_SIZE / 4),
+        ASTEROIDS_STARTING_MAX_SPEED,
+        ASTEROID_AVERAGE_VERTICES,
+        ASTEROIDS_JAGGEDNESS,
         level,
         deltaTime
       )
@@ -152,24 +155,24 @@ function destroyAsteroid(index: number) {
       new Asteroid(
         x,
         y,
-        Math.ceil(ROIDS_SIZE / 4),
-        ROIDS_SPD,
-        ROIDS_VERT,
-        ROIDS_JAG,
+        Math.ceil(ASTEROIDS_STARTING_SIZE / 4),
+        ASTEROIDS_STARTING_MAX_SPEED,
+        ASTEROID_AVERAGE_VERTICES,
+        ASTEROIDS_JAGGEDNESS,
         level,
         deltaTime
       )
     );
-    score += ROID_PTS_LGE;
-  } else if (r === Math.ceil(ROIDS_SIZE / 4)) {
+    score += ASTEROID_POINTS_LARGE;
+  } else if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 4)) {
     asteroids.push(
       new Asteroid(
         x,
         y,
-        Math.ceil(ROIDS_SIZE / 8),
-        ROIDS_SPD,
-        ROIDS_VERT,
-        ROIDS_JAG,
+        Math.ceil(ASTEROIDS_STARTING_SIZE / 8),
+        ASTEROIDS_STARTING_MAX_SPEED,
+        ASTEROID_AVERAGE_VERTICES,
+        ASTEROIDS_JAGGEDNESS,
         level,
         deltaTime
       )
@@ -178,17 +181,17 @@ function destroyAsteroid(index: number) {
       new Asteroid(
         x,
         y,
-        Math.ceil(ROIDS_SIZE / 8),
-        ROIDS_SPD,
-        ROIDS_VERT,
-        ROIDS_JAG,
+        Math.ceil(ASTEROIDS_STARTING_SIZE / 8),
+        ASTEROIDS_STARTING_MAX_SPEED,
+        ASTEROID_AVERAGE_VERTICES,
+        ASTEROIDS_JAGGEDNESS,
         level,
         deltaTime
       )
     );
-    score += ROID_PTS_MED;
+    score += ASTEROID_POINTS_MEDIUM;
   } else {
-    score += ROID_PTS_SML;
+    score += ASTEROID_POINTS_SMALL;
   }
 
   // check high score
@@ -437,7 +440,7 @@ function update() {
       );
       context.fill();
     } else {
-      // draw the explesion
+      // draw the explosion
       context.fillStyle = 'orangered';
       context.beginPath();
       context.arc(
@@ -562,7 +565,7 @@ function update() {
     ship.x += ship.thrust.x;
     ship.y += ship.thrust.y;
   } else {
-    // reduce the explode time
+    // reduce the explosion time
     ship.explodeTime--;
 
     // reset the ship after the explosion has finished
