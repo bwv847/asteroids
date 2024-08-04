@@ -9,4 +9,18 @@ body {
 
 .asteroids-canvas {
   border: 1px solid black;
+  position: relative;
+}
+
+.togglePause {
+  cursor: pointer;
+  background: black;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
 }

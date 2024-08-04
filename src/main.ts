@@ -49,6 +49,8 @@ let scoreHigh: number;
 let ship: Ship;
 let text: string;
 let textAlpha: number;
+let isPause: boolean = false;
+let requestAnimationId: number = 0;
 
 let deltaTime = 0.008;
 newGame();
@@ -56,6 +58,23 @@ newGame();
 // set up event handlers
 document.addEventListener('keydown', keyDown);
 document.addEventListener('keyup', keyUp);
+const $togglePause = document.getElementById('togglePause');
+
+if ($togglePause) {
+  $togglePause.addEventListener('click', () => {
+    togglePause();
+
+    if (isPause) {
+      // make button have a symbol of play
+      $togglePause.innerText = '\u25B6';
+      $togglePause.style.fontSize = '10px';
+    } else {
+      // make button have a symbol of pause
+      $togglePause.innerText = '\u23F8';
+      $togglePause.style.fontSize = '16px';
+    }
+  });
+}
 
 // set up the game loop
 window.requestAnimationFrame(draw);
@@ -69,7 +88,17 @@ function draw(currentTime: number) {
   lastTime = currentTime;
 
   update();
-  window.requestAnimationFrame(draw);
+  requestAnimationId = window.requestAnimationFrame(draw);
+}
+
+function togglePause() {
+  isPause = !isPause;
+
+  if (isPause) {
+    window.cancelAnimationFrame(requestAnimationId);
+  } else {
+    window.requestAnimationFrame(draw);
+  }
 }
 
 function createAsteroidBelt() {
