@@ -133,7 +133,7 @@ function destroyAsteroid(index: number) {
   const r = roids[index].r;
 
   // split the asteroid in two if necessary
-  if (r == Math.ceil(ROIDS_SIZE / 2)) {
+  if (r === Math.ceil(ROIDS_SIZE / 2)) {
     roids.push(
       new Asteroid(
         x,
@@ -159,7 +159,7 @@ function destroyAsteroid(index: number) {
       )
     );
     score += ROID_PTS_LGE;
-  } else if (r == Math.ceil(ROIDS_SIZE / 4)) {
+  } else if (r === Math.ceil(ROIDS_SIZE / 4)) {
     roids.push(
       new Asteroid(
         x,
@@ -199,7 +199,7 @@ function destroyAsteroid(index: number) {
   roids.splice(index, 1);
 
   // new level when no more asteroids
-  if (roids.length == 0) {
+  if (roids.length === 0) {
     level++;
     newLevel();
   }
@@ -261,7 +261,7 @@ function newGame() {
 
   // get the high score from local storage
   const scoreStr = localStorage.getItem(SAVE_KEY_SCORE);
-  if (scoreStr == null) {
+  if (scoreStr === null) {
     scoreHigh = 0;
   } else {
     scoreHigh = parseInt(scoreStr);
@@ -300,7 +300,7 @@ function shootLaser() {
 }
 
 function update() {
-  const blinkOn = ship.blinkNum % 2 == 0;
+  const blinkOn = ship.blinkNum % 2 === 0;
   const exploding = ship.explodeTime > 0;
 
   // draw space
@@ -358,7 +358,7 @@ function update() {
       ship.blinkTime--;
 
       // reduce the blink num
-      if (ship.blinkTime == 0) {
+      if (ship.blinkTime === 0) {
         ship.blinkTime = Math.ceil(SHIP_BLINK_DUR / deltaTime);
         ship.blinkNum--;
       }
@@ -440,7 +440,7 @@ function update() {
 
   // draw the lasers
   for (let i = 0; i < ship.lasers.length; i++) {
-    if (ship.lasers[i].explodeTime == 0) {
+    if (ship.lasers[i].explodeTime === 0) {
       ctx.fillStyle = 'rgb(255, 140, 0)';
       ctx.beginPath();
       ctx.arc(
@@ -503,7 +503,7 @@ function update() {
   // draw the lives
   let lifeColour;
   for (let i = 0; i < lives; i++) {
-    lifeColour = exploding && i == lives - 1 ? 'red' : 'black';
+    lifeColour = exploding && i === lives - 1 ? 'red' : 'black';
     ship.draw(
       15 + SHIP_SIZE + i * SHIP_SIZE * 2.3,
       SHIP_SIZE + 15,
@@ -544,7 +544,7 @@ function update() {
 
       // detect hits
       if (
-        ship.lasers[j].explodeTime == 0 &&
+        ship.lasers[j].explodeTime === 0 &&
         distBetweenPoints(ax, ay, lx, ly) < ar
       ) {
         // remove the asteroid and active the laser explosion
@@ -558,7 +558,7 @@ function update() {
   // check for asteroid collisions (when not exploding)
   if (!exploding) {
     // only check when not blinking
-    if (ship.blinkNum == 0 && !ship.dead) {
+    if (ship.blinkNum === 0 && !ship.dead) {
       for (let i = 0; i < roids.length; i++) {
         if (
           distBetweenPoints(ship.x, ship.y, roids[i].x, roids[i].y) <
@@ -582,9 +582,9 @@ function update() {
     ship.explodeTime--;
 
     // reset the ship after the explosion has finished
-    if (ship.explodeTime == 0) {
+    if (ship.explodeTime === 0) {
       lives--;
-      if (lives == 0) {
+      if (lives === 0) {
         gameOver();
       } else {
         ship = new Ship(
@@ -623,7 +623,7 @@ function update() {
       ship.lasers[i].explodeTime--;
 
       // destroy the laser after the duration is up
-      if (ship.lasers[i].explodeTime == 0) {
+      if (ship.lasers[i].explodeTime === 0) {
         ship.lasers.splice(i, 1);
         continue;
       }
