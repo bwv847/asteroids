@@ -31,14 +31,14 @@ import { distBetweenPoints } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
 import { Asteroid, AsteroidInterface } from './Asteroid.ts';
 
-const cvs = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
-cvs.style.width = window.innerWidth - 50 + 'px';
-cvs.width = cvs.offsetWidth - 50;
+const canvas = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
+canvas.style.width = window.innerWidth - 50 + 'px';
+canvas.width = canvas.offsetWidth - 50;
 
-cvs.style.height = window.innerHeight - 50 + 'px';
-cvs.height = cvs.offsetHeight - 50;
+canvas.style.height = window.innerHeight - 50 + 'px';
+canvas.height = canvas.offsetHeight - 50;
 
-const context = cvs.getContext('2d') as CanvasRenderingContext2D;
+const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 // set up the game parameters
 let level: number;
@@ -108,8 +108,8 @@ function createAsteroidBelt() {
   for (let i = 0; i < ROIDS_NUM + level; i++) {
     // random asteroid location (not touching spaceship)
     do {
-      x = Math.floor(Math.random() * cvs.width);
-      y = Math.floor(Math.random() * cvs.height);
+      x = Math.floor(Math.random() * canvas.width);
+      y = Math.floor(Math.random() * canvas.height);
     } while (distBetweenPoints(ship.x, ship.y, x, y) < ROIDS_SIZE * 2 + ship.r);
 
     roids.push(
@@ -259,7 +259,7 @@ function newGame() {
   level = 0;
   lives = GAME_LIVES;
   score = 0;
-  ship = new Ship(cvs, SHIP_SIZE, SHIP_INV_DUR, SHIP_BLINK_DUR, deltaTime);
+  ship = new Ship(canvas, SHIP_SIZE, SHIP_INV_DUR, SHIP_BLINK_DUR, deltaTime);
 
   // get the high score from local storage
   const scoreStr = localStorage.getItem(SAVE_KEY_SCORE);
@@ -286,7 +286,7 @@ function update() {
 
   // draw space
   context.fillStyle = 'white';
-  context.fillRect(0, 0, cvs.width, cvs.height);
+  context.fillRect(0, 0, canvas.width, canvas.height);
 
   // thrust the ship
   if (ship.thrusting && !ship.dead) {
@@ -480,7 +480,7 @@ function update() {
     context.textBaseline = 'middle';
     context.fillStyle = 'rgba(0, 0, 0, ' + textAlpha + ')';
     context.font = 'small-caps ' + TEXT_SIZE + 'px sans-serif';
-    context.fillText(text, cvs.width / 2, cvs.height * 0.75);
+    context.fillText(text, canvas.width / 2, canvas.height * 0.75);
     textAlpha -= (1.0 / TEXT_FADE_TIME) * deltaTime;
   }
 
@@ -502,14 +502,14 @@ function update() {
   context.textBaseline = 'middle';
   context.fillStyle = '#000';
   context.font = TEXT_SIZE + 'px sans-serif';
-  context.fillText(String(score), cvs.width - SHIP_SIZE / 2, SHIP_SIZE + 10);
+  context.fillText(String(score), canvas.width - SHIP_SIZE / 2, SHIP_SIZE + 10);
 
   // draw the high score
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillStyle = '#000';
   context.font = TEXT_SIZE * 0.75 + 'px sans-serif';
-  context.fillText('Best ' + scoreHigh, cvs.width / 2, SHIP_SIZE + 10);
+  context.fillText('Best ' + scoreHigh, canvas.width / 2, SHIP_SIZE + 10);
 
   // detect laser hits on asteroids
 
@@ -572,7 +572,7 @@ function update() {
         gameOver();
       } else {
         ship = new Ship(
-          cvs,
+          canvas,
           SHIP_SIZE,
           SHIP_INV_DUR,
           SHIP_BLINK_DUR,
@@ -584,20 +584,20 @@ function update() {
 
   // handle edge of screen
   if (ship.x < 0 - ship.r) {
-    ship.x = cvs.width + ship.r;
-  } else if (ship.x > cvs.width + ship.r) {
+    ship.x = canvas.width + ship.r;
+  } else if (ship.x > canvas.width + ship.r) {
     ship.x = 0 - ship.r;
   }
   if (ship.y < 0 - ship.r) {
-    ship.y = cvs.height + ship.r;
-  } else if (ship.y > cvs.height + ship.r) {
+    ship.y = canvas.height + ship.r;
+  } else if (ship.y > canvas.height + ship.r) {
     ship.y = 0 - ship.r;
   }
 
   // move the lasers
   for (let i = ship.lasers.length - 1; i >= 0; i--) {
     // check distance travelled
-    if (ship.lasers[i].dist > LASER_DIST * cvs.width) {
+    if (ship.lasers[i].dist > LASER_DIST * canvas.width) {
       ship.lasers.splice(i, 1);
       continue;
     }
@@ -623,13 +623,13 @@ function update() {
     }
     // handle edge of screen
     if (ship.lasers[i].x < 0) {
-      ship.lasers[i].x = cvs.width;
-    } else if (ship.lasers[i].x > cvs.width) {
+      ship.lasers[i].x = canvas.width;
+    } else if (ship.lasers[i].x > canvas.width) {
       ship.lasers[i].x = 0;
     }
     if (ship.lasers[i].y < 0) {
-      ship.lasers[i].y = cvs.height;
-    } else if (ship.lasers[i].y > cvs.height) {
+      ship.lasers[i].y = canvas.height;
+    } else if (ship.lasers[i].y > canvas.height) {
       ship.lasers[i].y = 0;
     }
   }
@@ -641,13 +641,13 @@ function update() {
 
     // handel asteroid edge of screen
     if (roids[i].x < 0 - roids[i].r) {
-      roids[i].x = cvs.width + roids[i].r;
-    } else if (roids[i].x > cvs.width + roids[i].r) {
+      roids[i].x = canvas.width + roids[i].r;
+    } else if (roids[i].x > canvas.width + roids[i].r) {
       roids[i].x = 0 - roids[i].r;
     }
     if (roids[i].y < 0 - roids[i].r) {
-      roids[i].y = cvs.width + roids[i].r;
-    } else if (roids[i].y > cvs.width + roids[i].r) {
+      roids[i].y = canvas.width + roids[i].r;
+    } else if (roids[i].y > canvas.width + roids[i].r) {
       roids[i].y = 0 - roids[i].r;
     }
   }
