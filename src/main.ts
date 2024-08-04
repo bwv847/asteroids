@@ -43,7 +43,7 @@ const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 // set up the game parameters
 let level: number;
 let lives: number;
-let roids: AsteroidInterface[];
+let asteroids: AsteroidInterface[];
 let score: number;
 let scoreHigh: number;
 let ship: ShipInterface;
@@ -130,13 +130,13 @@ function createAsteroidBelt() {
 }
 
 function destroyAsteroid(index: number) {
-  const x = roids[index].x;
-  const y = roids[index].y;
-  const r = roids[index].r;
+  const x = asteroids[index].x;
+  const y = asteroids[index].y;
+  const r = asteroids[index].r;
 
   // split the asteroid in two if necessary
   if (r === Math.ceil(ROIDS_SIZE / 2)) {
-    roids.push(
+    asteroids.push(
       new Asteroid(
         x,
         y,
@@ -148,7 +148,7 @@ function destroyAsteroid(index: number) {
         deltaTime
       )
     );
-    roids.push(
+    asteroids.push(
       new Asteroid(
         x,
         y,
@@ -162,7 +162,7 @@ function destroyAsteroid(index: number) {
     );
     score += ROID_PTS_LGE;
   } else if (r === Math.ceil(ROIDS_SIZE / 4)) {
-    roids.push(
+    asteroids.push(
       new Asteroid(
         x,
         y,
@@ -174,7 +174,7 @@ function destroyAsteroid(index: number) {
         deltaTime
       )
     );
-    roids.push(
+    asteroids.push(
       new Asteroid(
         x,
         y,
@@ -198,10 +198,10 @@ function destroyAsteroid(index: number) {
   }
 
   // destroy the asteroid
-  roids.splice(index, 1);
+  asteroids.splice(index, 1);
 
   // new level when no more asteroids
-  if (roids.length === 0) {
+  if (asteroids.length === 0) {
     level++;
     newLevel();
   }
@@ -275,7 +275,7 @@ function newGame() {
 function newLevel() {
   text = 'Level ' + (level + 1);
   textAlpha = 1.0;
-  roids = createAsteroidBelt();
+  asteroids = createAsteroidBelt();
 }
 
 // TODO: make degrees to radians util
@@ -381,16 +381,16 @@ function update() {
 
   // draw the asteroids
   let x, y, r, a, vert, offs;
-  for (let i = 0; i < roids.length; i++) {
+  for (let i = 0; i < asteroids.length; i++) {
     context.strokeStyle = 'black';
     context.lineWidth = SHIP_SIZE / 20;
     // get the asteroid properties
-    x = roids[i].x;
-    y = roids[i].y;
-    r = roids[i].r;
-    a = roids[i].a;
-    vert = roids[i].vert;
-    offs = roids[i].offs;
+    x = asteroids[i].x;
+    y = asteroids[i].y;
+    r = asteroids[i].r;
+    a = asteroids[i].a;
+    vert = asteroids[i].vert;
+    offs = asteroids[i].offs;
     // draw a path
     context.beginPath();
     context.moveTo(
@@ -514,11 +514,11 @@ function update() {
   // detect laser hits on asteroids
 
   let ax, ay, ar, lx, ly;
-  for (let i = roids.length - 1; i >= 0; i--) {
+  for (let i = asteroids.length - 1; i >= 0; i--) {
     // grab the asteroid properties
-    ax = roids[i].x;
-    ay = roids[i].y;
-    ar = roids[i].r;
+    ax = asteroids[i].x;
+    ay = asteroids[i].y;
+    ar = asteroids[i].r;
 
     // loop over the lasers
     for (let j = ship.lasers.length - 1; j >= 0; j--) {
@@ -543,10 +543,10 @@ function update() {
   if (!exploding) {
     // only check when not blinking
     if (ship.blinkNum === 0 && !ship.dead) {
-      for (let i = 0; i < roids.length; i++) {
+      for (let i = 0; i < asteroids.length; i++) {
         if (
-          distBetweenPoints(ship.x, ship.y, roids[i].x, roids[i].y) <
-          ship.r + roids[i].r
+          distBetweenPoints(ship.x, ship.y, asteroids[i].x, asteroids[i].y) <
+          ship.r + asteroids[i].r
         ) {
           ship.explode(SHIP_EXPLODE_DUR, deltaTime);
           destroyAsteroid(i);
@@ -635,20 +635,20 @@ function update() {
   }
 
   // move the asteroid
-  for (let i = 0; i < roids.length; i++) {
-    roids[i].x += roids[i].xv;
-    roids[i].y += roids[i].yv;
+  for (let i = 0; i < asteroids.length; i++) {
+    asteroids[i].x += asteroids[i].xv;
+    asteroids[i].y += asteroids[i].yv;
 
     // handel asteroid edge of screen
-    if (roids[i].x < 0 - roids[i].r) {
-      roids[i].x = canvas.width + roids[i].r;
-    } else if (roids[i].x > canvas.width + roids[i].r) {
-      roids[i].x = 0 - roids[i].r;
+    if (asteroids[i].x < 0 - asteroids[i].r) {
+      asteroids[i].x = canvas.width + asteroids[i].r;
+    } else if (asteroids[i].x > canvas.width + asteroids[i].r) {
+      asteroids[i].x = 0 - asteroids[i].r;
     }
-    if (roids[i].y < 0 - roids[i].r) {
-      roids[i].y = canvas.width + roids[i].r;
-    } else if (roids[i].y > canvas.width + roids[i].r) {
-      roids[i].y = 0 - roids[i].r;
+    if (asteroids[i].y < 0 - asteroids[i].r) {
+      asteroids[i].y = canvas.width + asteroids[i].r;
+    } else if (asteroids[i].y > canvas.width + asteroids[i].r) {
+      asteroids[i].y = 0 - asteroids[i].r;
     }
   }
 }
