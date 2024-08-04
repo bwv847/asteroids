@@ -58,8 +58,8 @@ document.addEventListener('keydown', (event) =>
   keyDown(event, ship, deltaTime)
 );
 document.addEventListener('keyup', (event) => keyUp(event, ship));
-const $togglePause = document.getElementById('togglePause');
 
+const $togglePause = document.getElementById('togglePause');
 if ($togglePause) {
   $togglePause.addEventListener('click', () => {
     togglePause();
@@ -253,7 +253,6 @@ function update() {
   if (ship.thrusting && !ship.dead) {
     ship.thrust.x += SHIP_THRUST * Math.cos(ship.a) * deltaTime;
     ship.thrust.y -= SHIP_THRUST * Math.sin(ship.a) * deltaTime;
-    // fxThrust.play();
 
     // draw the thruster
     if (!exploding && blinkOn) {
@@ -285,7 +284,6 @@ function update() {
     // apply friction (slow the ship down when not thrusting)
     ship.thrust.x -= FRICTION * ship.thrust.x * deltaTime;
     ship.thrust.y -= FRICTION * ship.thrust.y * deltaTime;
-    // fxThrust.stop();
   }
 
   // draw the triangular ship
