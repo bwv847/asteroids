@@ -1,5 +1,3 @@
-import { Asteroid } from './types.ts';
-
 import {
   FRICTION,
   GAME_LIVES,
@@ -31,6 +29,7 @@ import {
 import './style.css';
 import { distBetweenPoints } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
+import { Asteroid, AsteroidInterface } from './Asteroid.ts';
 
 const cvs = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
 cvs.style.width = window.innerWidth - 50 + 'px';
@@ -44,7 +43,7 @@ const ctx = cvs.getContext('2d') as CanvasRenderingContext2D;
 // set up the game parameters
 let level: number;
 let lives: number;
-let roids: Asteroid[];
+let roids: AsteroidInterface[];
 let score: number;
 let scoreHigh: number;
 let ship: ShipInterface;
@@ -113,7 +112,18 @@ function createAsteroidBelt() {
       y = Math.floor(Math.random() * cvs.height);
     } while (distBetweenPoints(ship.x, ship.y, x, y) < ROIDS_SIZE * 2 + ship.r);
 
-    roids.push(newAsteroid(x, y, Math.ceil(ROIDS_SIZE / 2)));
+    roids.push(
+      new Asteroid(
+        x,
+        y,
+        Math.ceil(ROIDS_SIZE / 2),
+        ROIDS_SPD,
+        ROIDS_VERT,
+        ROIDS_JAG,
+        level,
+        deltaTime
+      )
+    );
   }
 }
 
@@ -124,12 +134,56 @@ function destroyAsteroid(index: number) {
 
   // split the asteroid in two if necessary
   if (r == Math.ceil(ROIDS_SIZE / 2)) {
-    roids.push(newAsteroid(x, y, Math.ceil(ROIDS_SIZE / 4)));
-    roids.push(newAsteroid(x, y, Math.ceil(ROIDS_SIZE / 4)));
+    roids.push(
+      new Asteroid(
+        x,
+        y,
+        Math.ceil(ROIDS_SIZE / 4),
+        ROIDS_SPD,
+        ROIDS_VERT,
+        ROIDS_JAG,
+        level,
+        deltaTime
+      )
+    );
+    roids.push(
+      new Asteroid(
+        x,
+        y,
+        Math.ceil(ROIDS_SIZE / 4),
+        ROIDS_SPD,
+        ROIDS_VERT,
+        ROIDS_JAG,
+        level,
+        deltaTime
+      )
+    );
     score += ROID_PTS_LGE;
   } else if (r == Math.ceil(ROIDS_SIZE / 4)) {
-    roids.push(newAsteroid(x, y, Math.ceil(ROIDS_SIZE / 8)));
-    roids.push(newAsteroid(x, y, Math.ceil(ROIDS_SIZE / 8)));
+    roids.push(
+      new Asteroid(
+        x,
+        y,
+        Math.ceil(ROIDS_SIZE / 8),
+        ROIDS_SPD,
+        ROIDS_VERT,
+        ROIDS_JAG,
+        level,
+        deltaTime
+      )
+    );
+    roids.push(
+      new Asteroid(
+        x,
+        y,
+        Math.ceil(ROIDS_SIZE / 8),
+        ROIDS_SPD,
+        ROIDS_VERT,
+        ROIDS_JAG,
+        level,
+        deltaTime
+      )
+    );
     score += ROID_PTS_MED;
   } else {
     score += ROID_PTS_SML;
@@ -224,38 +278,6 @@ function keyUp(ev: KeyboardEvent) {
       ship.rot = 0;
       break;
   }
-}
-
-function newAsteroid(x: number, y: number, r: number) {
-  const lvlMult = 1 + 0.1 * level;
-
-  const roid: Asteroid = {
-    x: x,
-    y: y,
-    xv:
-      Math.random() *
-      ROIDS_SPD *
-      lvlMult *
-      deltaTime *
-      (Math.random() < 0.5 ? 1 : -1),
-    yv:
-      Math.random() *
-      ROIDS_SPD *
-      lvlMult *
-      deltaTime *
-      (Math.random() < 0.5 ? 1 : -1),
-    r: r,
-    a: Math.random() * Math.PI * 2, // in radians
-    vert: Math.floor(Math.random() * (ROIDS_VERT + 1) + ROIDS_VERT / 2),
-    offs: [],
-  };
-
-  // create the vertex offets array
-  for (let i = 0; i < roid.vert; i++) {
-    roid.offs.push(Math.random() * ROIDS_JAG * 2 + 1 - ROIDS_JAG);
-  }
-
-  return roid;
 }
 
 function newGame() {
