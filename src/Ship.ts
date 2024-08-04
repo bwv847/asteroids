@@ -22,6 +22,7 @@ export type ShipInterface = {
     ctx: CanvasRenderingContext2D,
     colour: string
   ) => void;
+  explode: (duration: number, deltaTime: number) => void;
 };
 
 export class Ship implements ShipInterface {
@@ -88,5 +89,9 @@ export class Ship implements ShipInterface {
     );
     ctx.closePath();
     ctx.stroke();
+  }
+
+  explode(duration: number, deltaTime: number) {
+    this.explodeTime = Math.ceil(duration * deltaTime);
   }
 }

@@ -205,10 +205,6 @@ function destroyAsteroid(index: number) {
   }
 }
 
-function explodeShip() {
-  ship.explodeTime = Math.ceil(SHIP_EXPLODE_DUR * deltaTime);
-}
-
 function gameOver() {
   ship.dead = true;
   text = 'Game Over';
@@ -568,7 +564,7 @@ function update() {
           distBetweenPoints(ship.x, ship.y, roids[i].x, roids[i].y) <
           ship.r + roids[i].r
         ) {
-          explodeShip();
+          ship.explode(SHIP_EXPLODE_DUR, deltaTime);
           destroyAsteroid(i);
           break;
         }
