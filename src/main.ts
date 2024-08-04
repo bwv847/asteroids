@@ -1,4 +1,4 @@
-import { Asteroid, Ship } from './types.ts';
+import { Asteroid } from './types.ts';
 
 import {
   FRICTION,
@@ -30,6 +30,7 @@ import {
 
 import './style.css';
 import { distBetweenPoints } from './utils.ts';
+import { Ship, ShipInterface } from './Ship.ts';
 
 const cvs = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
 cvs.style.width = window.innerWidth - 50 + 'px';
@@ -46,7 +47,7 @@ let lives: number;
 let roids: Asteroid[];
 let score: number;
 let scoreHigh: number;
-let ship: Ship;
+let ship: ShipInterface;
 let text: string;
 let textAlpha: number;
 let isPause: boolean = false;
@@ -261,7 +262,7 @@ function newGame() {
   level = 0;
   lives = GAME_LIVES;
   score = 0;
-  ship = newShip();
+  ship = new Ship(cvs, SHIP_SIZE, SHIP_INV_DUR, SHIP_BLINK_DUR, deltaTime);
 
   // get the high score from local storage
   const scoreStr = localStorage.getItem(SAVE_KEY_SCORE);
@@ -280,26 +281,7 @@ function newLevel() {
   createAsteroidBelt();
 }
 
-function newShip() {
-  return {
-    x: cvs.width / 2,
-    y: cvs.height / 2,
-    r: SHIP_SIZE,
-    a: (90 / 180) * Math.PI, // convert to radians
-    blinkNum: Math.ceil(SHIP_INV_DUR / SHIP_BLINK_DUR),
-    blinkTime: Math.ceil(SHIP_BLINK_DUR / deltaTime),
-    canShoot: true,
-    dead: false,
-    explodeTime: 0,
-    lasers: [],
-    rot: 0,
-    thrusting: false,
-    thrust: {
-      x: 0,
-      y: 0,
-    },
-  };
-}
+// TODO: make degrees to radians util
 
 function shootLaser() {
   // create the laser object
@@ -609,7 +591,13 @@ function update() {
       if (lives == 0) {
         gameOver();
       } else {
-        ship = newShip();
+        ship = new Ship(
+          cvs,
+          SHIP_SIZE,
+          SHIP_INV_DUR,
+          SHIP_BLINK_DUR,
+          deltaTime
+        );
       }
     }
   }
