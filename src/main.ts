@@ -133,41 +133,7 @@ function update() {
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   // thrust the ship
-  if (ship.thrusting && !ship.dead) {
-    ship.thrust.x += SHIP_THRUST * Math.cos(ship.a) * deltaTime;
-    ship.thrust.y -= SHIP_THRUST * Math.sin(ship.a) * deltaTime;
-
-    // draw the thruster
-    if (!exploding && blinkOn) {
-      context.strokeStyle = 'black'; // flame color
-      context.fillStyle = 'lightblue'; // flame color
-      context.lineWidth = SHIP_SIZE / 15;
-      context.beginPath();
-      context.moveTo(
-        // rear left
-        ship.x - ship.r * ((2 / 3) * Math.cos(ship.a) + 0.5 * Math.sin(ship.a)),
-        ship.y + ship.r * ((2 / 3) * Math.sin(ship.a) - 0.5 * Math.cos(ship.a))
-      );
-      context.lineWidth = 1;
-      context.lineTo(
-        // rear centre behind the ship
-        ship.x - ship.r * ((6 / 3) * Math.cos(ship.a)),
-        ship.y + ship.r * ((6 / 3) * Math.sin(ship.a))
-      );
-      context.lineTo(
-        // rear right
-        ship.x - ship.r * ((2 / 3) * Math.cos(ship.a) - 0.5 * Math.sin(ship.a)),
-        ship.y + ship.r * ((2 / 3) * Math.sin(ship.a) + 0.5 * Math.cos(ship.a))
-      );
-      context.closePath();
-      context.fill();
-      context.stroke();
-    }
-  } else {
-    // apply friction (slow the ship down when not thrusting)
-    ship.thrust.x -= FRICTION * ship.thrust.x * deltaTime;
-    ship.thrust.y -= FRICTION * ship.thrust.y * deltaTime;
-  }
+  ship.doThrust(context, deltaTime);
 
   // draw the triangular ship
   if (!exploding) {

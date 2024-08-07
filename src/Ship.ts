@@ -1,5 +1,5 @@
 import { Laser, Thrust } from './types.ts';
-import { SHIP_SIZE } from './constants.ts';
+import { FRICTION, SHIP_SIZE, SHIP_THRUST } from './constants.ts';
 
 export type ShipInterface = {
   x: number;
@@ -25,6 +25,7 @@ export type ShipInterface = {
   explode: (duration: number, deltaTime: number) => void;
   shootLaser: (speed: number, quantityLimit: number) => void;
   drawExplosion: (context: CanvasRenderingContext2D) => void;
+  doThrust: (context: CanvasRenderingContext2D, deltaTime: number) => void;
 };
 
 export class Ship implements ShipInterface {
@@ -142,5 +143,49 @@ export class Ship implements ShipInterface {
     context.beginPath();
     context.arc(this.x, this.y, this.r * 0.5, 0, Math.PI * 2, false);
     context.fill();
+  }
+
+  doThrust(context: CanvasRenderingContext2D, deltaTime: number) {
+    if (this.thrusting && !this.dead) {
+      this.thrust.x += SHIP_THRUST * Math.cos(this.a) * deltaTime;
+      this.thrust.y -= SHIP_THRUST * Math.sin(this.a) * deltaTime;
+
+      const blinkOn = this.blinkNum % 2 === 0;
+      const exploding = this.explodeTime > 0;
+
+      if (!exploding && blinkOn) {
+        context.strokeStyle = 'black'; // flame color
+        context.fillStyle = 'lightblue'; // flame color
+        context.lineWidth = SHIP_SIZE / 15;
+        context.beginPath();
+        context.moveTo(
+          // rear left
+          this.x -
+            this.r * ((2 / 3) * Math.cos(this.a) + 0.5 * Math.sin(this.a)),
+          this.y +
+            this.r * ((2 / 3) * Math.sin(this.a) - 0.5 * Math.cos(this.a))
+        );
+        context.lineWidth = 1;
+        context.lineTo(
+          // rear centre behind the ship
+          this.x - this.r * ((6 / 3) * Math.cos(this.a)),
+          this.y + this.r * ((6 / 3) * Math.sin(this.a))
+        );
+        context.lineTo(
+          // rear right
+          this.x -
+            this.r * ((2 / 3) * Math.cos(this.a) - 0.5 * Math.sin(this.a)),
+          this.y +
+            this.r * ((2 / 3) * Math.sin(this.a) + 0.5 * Math.cos(this.a))
+        );
+        context.closePath();
+        context.fill();
+        context.stroke();
+      }
+    } else {
+      // apply friction (slow the ship down when not thrusting)
+      this.thrust.x -= FRICTION * this.thrust.x * deltaTime;
+      this.thrust.y -= FRICTION * this.thrust.y * deltaTime;
+    }
   }
 }
