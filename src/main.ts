@@ -3,13 +3,6 @@ import {
   GAME_LIVES,
   LASER_DIST,
   LASER_EXPLODE_DUR,
-  ASTEROIDS_JAGGEDNESS,
-  ASTEROID_POINTS_LARGE,
-  ASTEROID_POINTS_MEDIUM,
-  ASTEROID_POINTS_SMALL,
-  ASTEROIDS_STARTING_SIZE,
-  ASTEROIDS_STARTING_MAX_SPEED,
-  ASTEROID_AVERAGE_VERTICES,
   SAVE_KEY_SCORE,
   SHIP_EXPLODE_DUR,
   SHIP_BLINK_DUR,
@@ -25,7 +18,6 @@ import {
 import './style.css';
 import { distBetweenPoints } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
-import { Asteroid } from './Asteroid.ts';
 import { keyDown, keyUp } from './keyboard.ts';
 import { AsteroidBelt } from './AsteroidBelt.ts';
 
@@ -98,84 +90,6 @@ const togglePause = () => {
     window.cancelAnimationFrame(requestAnimationId);
   } else {
     window.requestAnimationFrame(draw);
-  }
-};
-
-const destroyAsteroid = (index: number) => {
-  const x = asteroidBelt.asteroids[index].x;
-  const y = asteroidBelt.asteroids[index].y;
-  const r = asteroidBelt.asteroids[index].r;
-
-  // split the asteroid in two if necessary
-  if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 2)) {
-    asteroidBelt.asteroids.push(
-      new Asteroid(
-        x,
-        y,
-        Math.ceil(ASTEROIDS_STARTING_SIZE / 4),
-        ASTEROIDS_STARTING_MAX_SPEED,
-        ASTEROID_AVERAGE_VERTICES,
-        ASTEROIDS_JAGGEDNESS,
-        level,
-        deltaTime
-      )
-    );
-    asteroidBelt.asteroids.push(
-      new Asteroid(
-        x,
-        y,
-        Math.ceil(ASTEROIDS_STARTING_SIZE / 4),
-        ASTEROIDS_STARTING_MAX_SPEED,
-        ASTEROID_AVERAGE_VERTICES,
-        ASTEROIDS_JAGGEDNESS,
-        level,
-        deltaTime
-      )
-    );
-    score += ASTEROID_POINTS_LARGE;
-  } else if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 4)) {
-    asteroidBelt.asteroids.push(
-      new Asteroid(
-        x,
-        y,
-        Math.ceil(ASTEROIDS_STARTING_SIZE / 8),
-        ASTEROIDS_STARTING_MAX_SPEED,
-        ASTEROID_AVERAGE_VERTICES,
-        ASTEROIDS_JAGGEDNESS,
-        level,
-        deltaTime
-      )
-    );
-    asteroidBelt.asteroids.push(
-      new Asteroid(
-        x,
-        y,
-        Math.ceil(ASTEROIDS_STARTING_SIZE / 8),
-        ASTEROIDS_STARTING_MAX_SPEED,
-        ASTEROID_AVERAGE_VERTICES,
-        ASTEROIDS_JAGGEDNESS,
-        level,
-        deltaTime
-      )
-    );
-    score += ASTEROID_POINTS_MEDIUM;
-  } else {
-    score += ASTEROID_POINTS_SMALL;
-  }
-
-  // check high score
-  if (score > scoreHigh) {
-    scoreHigh = score;
-    localStorage.setItem(SAVE_KEY_SCORE, String(scoreHigh));
-  }
-
-  // destroy the asteroid
-  asteroidBelt.asteroids.splice(index, 1);
-
-  // new level when no more asteroidBelt
-  if (asteroidBelt.asteroids.length === 0) {
-    level++;
-    newLevel();
   }
 };
 
@@ -436,7 +350,14 @@ function update() {
         distBetweenPoints(ax, ay, lx, ly) < ar
       ) {
         // remove the asteroid and active the laser explosion
-        destroyAsteroid(i);
+        asteroidBelt.destroyAsteroid(
+          i,
+          level,
+          deltaTime,
+          score,
+          scoreHigh,
+          newLevel
+        );
         ship.lasers[j].explodeTime = Math.ceil(LASER_EXPLODE_DUR * deltaTime);
         break;
       }
@@ -458,7 +379,14 @@ function update() {
           ship.r + asteroidBelt.asteroids[i].r
         ) {
           ship.explode(SHIP_EXPLODE_DUR, deltaTime);
-          destroyAsteroid(i);
+          asteroidBelt.destroyAsteroid(
+            i,
+            level,
+            deltaTime,
+            score,
+            scoreHigh,
+            newLevel
+          );
           break;
         }
       }
