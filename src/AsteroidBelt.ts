@@ -147,7 +147,7 @@ export class AsteroidBelt implements AsteroidBeltInterface {
       this.asteroids[i].y += this.asteroids[i].yv;
 
       // handel screen edges
-      if (this.asteroids[i].x < 0 - this.asteroids[i].r) {
+      if (this.asteroids[i].x < -this.asteroids[i].r) {
         this.asteroids[i].x = canvas.width + this.asteroids[i].r;
       }
 
@@ -155,11 +155,11 @@ export class AsteroidBelt implements AsteroidBeltInterface {
         this.asteroids[i].x = 0 - this.asteroids[i].r;
       }
 
-      if (this.asteroids[i].y < 0 - this.asteroids[i].r) {
-        this.asteroids[i].y = canvas.width + this.asteroids[i].r;
+      if (this.asteroids[i].y < -this.asteroids[i].r) {
+        this.asteroids[i].y = canvas.height + this.asteroids[i].r;
       }
 
-      if (this.asteroids[i].y > canvas.width + this.asteroids[i].r) {
+      if (this.asteroids[i].y > canvas.height + this.asteroids[i].r) {
         this.asteroids[i].y = 0 - this.asteroids[i].r;
       }
     }
