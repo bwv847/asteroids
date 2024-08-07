@@ -7,7 +7,6 @@ import {
   ASTEROID_POINTS_LARGE,
   ASTEROID_POINTS_MEDIUM,
   ASTEROID_POINTS_SMALL,
-  ASTEROIDS_STARTING_NUMBER,
   ASTEROIDS_STARTING_SIZE,
   ASTEROIDS_STARTING_MAX_SPEED,
   ASTEROID_AVERAGE_VERTICES,
@@ -28,6 +27,7 @@ import { distBetweenPoints } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
 import { Asteroid, AsteroidInterface } from './Asteroid.ts';
 import { keyDown, keyUp } from './keyboard.ts';
+import { AsteroidBelt } from './AsteroidBelt.ts';
 
 const canvas = document.querySelector('#asteroids-canvas') as HTMLCanvasElement;
 canvas.style.width = window.innerWidth - 50 + 'px';
@@ -100,37 +100,6 @@ const togglePause = () => {
     window.requestAnimationFrame(draw);
   }
 };
-
-function createAsteroidBelt() {
-  const asteroids = [];
-
-  let x, y;
-  for (let i = 0; i < ASTEROIDS_STARTING_NUMBER + level; i++) {
-    // random asteroid location (not touching spaceship)
-    do {
-      x = Math.floor(Math.random() * canvas.width);
-      y = Math.floor(Math.random() * canvas.height);
-    } while (
-      distBetweenPoints(ship.x, ship.y, x, y) <
-      ASTEROIDS_STARTING_SIZE * 2 + ship.r
-    );
-
-    asteroids.push(
-      new Asteroid(
-        x,
-        y,
-        Math.ceil(ASTEROIDS_STARTING_SIZE / 2),
-        ASTEROIDS_STARTING_MAX_SPEED,
-        ASTEROID_AVERAGE_VERTICES,
-        ASTEROIDS_JAGGEDNESS,
-        level,
-        deltaTime
-      )
-    );
-  }
-
-  return asteroids;
-}
 
 const destroyAsteroid = (index: number) => {
   const x = asteroids[index].x;
@@ -236,7 +205,7 @@ function newGame() {
 function newLevel() {
   text = 'Level ' + (level + 1);
   textAlpha = 1.0;
-  asteroids = createAsteroidBelt();
+  asteroids = new AsteroidBelt(canvas, ship, level, deltaTime).asteroids;
 }
 
 // TODO: make degrees to radians util
@@ -304,31 +273,7 @@ function update() {
       }
     }
   } else {
-    // draw the explosion
-    context.fillStyle = 'darkred';
-    context.beginPath();
-    context.arc(ship.x, ship.y, ship.r * 1.7, 0, Math.PI * 2, false);
-    context.fill();
-
-    context.fillStyle = 'red';
-    context.beginPath();
-    context.arc(ship.x, ship.y, ship.r * 1.4, 0, Math.PI * 2, false);
-    context.fill();
-
-    context.fillStyle = 'orange';
-    context.beginPath();
-    context.arc(ship.x, ship.y, ship.r * 1.1, 0, Math.PI * 2, false);
-    context.fill();
-
-    context.fillStyle = 'yellow';
-    context.beginPath();
-    context.arc(ship.x, ship.y, ship.r * 0.8, 0, Math.PI * 2, false);
-    context.fill();
-
-    context.fillStyle = 'white';
-    context.beginPath();
-    context.arc(ship.x, ship.y, ship.r * 0.5, 0, Math.PI * 2, false);
-    context.fill();
+    ship.drawExplosion(context);
   }
 
   if (SHOW_BOUNDING) {
@@ -544,12 +489,17 @@ function update() {
   // handle edge of screen
   if (ship.x < 0 - ship.r) {
     ship.x = canvas.width + ship.r;
-  } else if (ship.x > canvas.width + ship.r) {
+  }
+
+  if (ship.x > canvas.width + ship.r) {
     ship.x = 0 - ship.r;
   }
+
   if (ship.y < 0 - ship.r) {
     ship.y = canvas.height + ship.r;
-  } else if (ship.y > canvas.height + ship.r) {
+  }
+
+  if (ship.y > canvas.height + ship.r) {
     ship.y = 0 - ship.r;
   }
 
@@ -580,15 +530,21 @@ function update() {
         Math.pow(ship.lasers[i].xv, 2) + Math.pow(ship.lasers[i].yv, 2)
       );
     }
+
     // handle edge of screen
     if (ship.lasers[i].x < 0) {
       ship.lasers[i].x = canvas.width;
-    } else if (ship.lasers[i].x > canvas.width) {
+    }
+
+    if (ship.lasers[i].x > canvas.width) {
       ship.lasers[i].x = 0;
     }
+
     if (ship.lasers[i].y < 0) {
       ship.lasers[i].y = canvas.height;
-    } else if (ship.lasers[i].y > canvas.height) {
+    }
+
+    if (ship.lasers[i].y > canvas.height) {
       ship.lasers[i].y = 0;
     }
   }
@@ -601,12 +557,17 @@ function update() {
     // handel asteroid edge of screen
     if (asteroids[i].x < 0 - asteroids[i].r) {
       asteroids[i].x = canvas.width + asteroids[i].r;
-    } else if (asteroids[i].x > canvas.width + asteroids[i].r) {
+    }
+
+    if (asteroids[i].x > canvas.width + asteroids[i].r) {
       asteroids[i].x = 0 - asteroids[i].r;
     }
+
     if (asteroids[i].y < 0 - asteroids[i].r) {
       asteroids[i].y = canvas.width + asteroids[i].r;
-    } else if (asteroids[i].y > canvas.width + asteroids[i].r) {
+    }
+
+    if (asteroids[i].y > canvas.width + asteroids[i].r) {
       asteroids[i].y = 0 - asteroids[i].r;
     }
   }

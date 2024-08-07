@@ -24,6 +24,7 @@ export type ShipInterface = {
   ) => void;
   explode: (duration: number, deltaTime: number) => void;
   shootLaser: (speed: number, quantityLimit: number) => void;
+  drawExplosion: (context: CanvasRenderingContext2D) => void;
 };
 
 export class Ship implements ShipInterface {
@@ -114,5 +115,32 @@ export class Ship implements ShipInterface {
 
     // prevent further shooting
     this.canShoot = false;
+  }
+
+  drawExplosion(context: CanvasRenderingContext2D) {
+    context.fillStyle = 'darkred';
+    context.beginPath();
+    context.arc(this.x, this.y, this.r * 1.7, 0, Math.PI * 2, false);
+    context.fill();
+
+    context.fillStyle = 'red';
+    context.beginPath();
+    context.arc(this.x, this.y, this.r * 1.4, 0, Math.PI * 2, false);
+    context.fill();
+
+    context.fillStyle = 'orange';
+    context.beginPath();
+    context.arc(this.x, this.y, this.r * 1.1, 0, Math.PI * 2, false);
+    context.fill();
+
+    context.fillStyle = 'yellow';
+    context.beginPath();
+    context.arc(this.x, this.y, this.r * 0.8, 0, Math.PI * 2, false);
+    context.fill();
+
+    context.fillStyle = 'white';
+    context.beginPath();
+    context.arc(this.x, this.y, this.r * 0.5, 0, Math.PI * 2, false);
+    context.fill();
   }
 }
