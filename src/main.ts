@@ -25,7 +25,7 @@ import {
 import './style.css';
 import { distBetweenPoints } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
-import { Asteroid, AsteroidInterface } from './Asteroid.ts';
+import { Asteroid } from './Asteroid.ts';
 import { keyDown, keyUp } from './keyboard.ts';
 import { AsteroidBelt } from './AsteroidBelt.ts';
 
@@ -41,7 +41,7 @@ const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 // set up the game parameters
 let level: number;
 let lives: number;
-let asteroidBelt: AsteroidInterface[];
+let asteroidBelt: AsteroidBelt;
 let score: number;
 let scoreHigh: number;
 let ship: ShipInterface;
@@ -102,13 +102,13 @@ const togglePause = () => {
 };
 
 const destroyAsteroid = (index: number) => {
-  const x = asteroidBelt[index].x;
-  const y = asteroidBelt[index].y;
-  const r = asteroidBelt[index].r;
+  const x = asteroidBelt.asteroids[index].x;
+  const y = asteroidBelt.asteroids[index].y;
+  const r = asteroidBelt.asteroids[index].r;
 
   // split the asteroid in two if necessary
   if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 2)) {
-    asteroidBelt.push(
+    asteroidBelt.asteroids.push(
       new Asteroid(
         x,
         y,
@@ -120,7 +120,7 @@ const destroyAsteroid = (index: number) => {
         deltaTime
       )
     );
-    asteroidBelt.push(
+    asteroidBelt.asteroids.push(
       new Asteroid(
         x,
         y,
@@ -134,7 +134,7 @@ const destroyAsteroid = (index: number) => {
     );
     score += ASTEROID_POINTS_LARGE;
   } else if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 4)) {
-    asteroidBelt.push(
+    asteroidBelt.asteroids.push(
       new Asteroid(
         x,
         y,
@@ -146,7 +146,7 @@ const destroyAsteroid = (index: number) => {
         deltaTime
       )
     );
-    asteroidBelt.push(
+    asteroidBelt.asteroids.push(
       new Asteroid(
         x,
         y,
@@ -170,10 +170,10 @@ const destroyAsteroid = (index: number) => {
   }
 
   // destroy the asteroid
-  asteroidBelt.splice(index, 1);
+  asteroidBelt.asteroids.splice(index, 1);
 
   // new level when no more asteroidBelt
-  if (asteroidBelt.length === 0) {
+  if (asteroidBelt.asteroids.length === 0) {
     level++;
     newLevel();
   }
@@ -205,7 +205,7 @@ function newGame() {
 function newLevel() {
   text = 'Level ' + (level + 1);
   textAlpha = 1.0;
-  asteroidBelt = new AsteroidBelt(canvas, ship, level, deltaTime).asteroids;
+  asteroidBelt = new AsteroidBelt(canvas, ship, level, deltaTime);
 }
 
 // TODO: make degrees to radians util
@@ -285,16 +285,16 @@ function update() {
 
   // draw the asteroidBelt
   let x, y, r, a, vert, offs;
-  for (let i = 0; i < asteroidBelt.length; i++) {
+  for (let i = 0; i < asteroidBelt.asteroids.length; i++) {
     context.strokeStyle = 'black';
     context.lineWidth = SHIP_SIZE / 20;
     // get the asteroid properties
-    x = asteroidBelt[i].x;
-    y = asteroidBelt[i].y;
-    r = asteroidBelt[i].r;
-    a = asteroidBelt[i].a;
-    vert = asteroidBelt[i].vert;
-    offs = asteroidBelt[i].offs;
+    x = asteroidBelt.asteroids[i].x;
+    y = asteroidBelt.asteroids[i].y;
+    r = asteroidBelt.asteroids[i].r;
+    a = asteroidBelt.asteroids[i].a;
+    vert = asteroidBelt.asteroids[i].vert;
+    offs = asteroidBelt.asteroids[i].offs;
     // draw a path
     context.beginPath();
     context.moveTo(
@@ -418,11 +418,11 @@ function update() {
   // detect laser hits on asteroidBelt
 
   let ax, ay, ar, lx, ly;
-  for (let i = asteroidBelt.length - 1; i >= 0; i--) {
+  for (let i = asteroidBelt.asteroids.length - 1; i >= 0; i--) {
     // grab the asteroid properties
-    ax = asteroidBelt[i].x;
-    ay = asteroidBelt[i].y;
-    ar = asteroidBelt[i].r;
+    ax = asteroidBelt.asteroids[i].x;
+    ay = asteroidBelt.asteroids[i].y;
+    ar = asteroidBelt.asteroids[i].r;
 
     // loop over the lasers
     for (let j = ship.lasers.length - 1; j >= 0; j--) {
@@ -447,15 +447,15 @@ function update() {
   if (!exploding) {
     // only check when not blinking
     if (ship.blinkNum === 0 && !ship.dead) {
-      for (let i = 0; i < asteroidBelt.length; i++) {
+      for (let i = 0; i < asteroidBelt.asteroids.length; i++) {
         if (
           distBetweenPoints(
             ship.x,
             ship.y,
-            asteroidBelt[i].x,
-            asteroidBelt[i].y
+            asteroidBelt.asteroids[i].x,
+            asteroidBelt.asteroids[i].y
           ) <
-          ship.r + asteroidBelt[i].r
+          ship.r + asteroidBelt.asteroids[i].r
         ) {
           ship.explode(SHIP_EXPLODE_DUR, deltaTime);
           destroyAsteroid(i);
@@ -555,25 +555,31 @@ function update() {
   }
 
   // move the asteroid
-  for (let i = 0; i < asteroidBelt.length; i++) {
-    asteroidBelt[i].x += asteroidBelt[i].xv;
-    asteroidBelt[i].y += asteroidBelt[i].yv;
+  for (let i = 0; i < asteroidBelt.asteroids.length; i++) {
+    asteroidBelt.asteroids[i].x += asteroidBelt.asteroids[i].xv;
+    asteroidBelt.asteroids[i].y += asteroidBelt.asteroids[i].yv;
 
     // handel asteroid edge of screen
-    if (asteroidBelt[i].x < 0 - asteroidBelt[i].r) {
-      asteroidBelt[i].x = canvas.width + asteroidBelt[i].r;
+    if (asteroidBelt.asteroids[i].x < 0 - asteroidBelt.asteroids[i].r) {
+      asteroidBelt.asteroids[i].x = canvas.width + asteroidBelt.asteroids[i].r;
     }
 
-    if (asteroidBelt[i].x > canvas.width + asteroidBelt[i].r) {
-      asteroidBelt[i].x = 0 - asteroidBelt[i].r;
+    if (
+      asteroidBelt.asteroids[i].x >
+      canvas.width + asteroidBelt.asteroids[i].r
+    ) {
+      asteroidBelt.asteroids[i].x = 0 - asteroidBelt.asteroids[i].r;
     }
 
-    if (asteroidBelt[i].y < 0 - asteroidBelt[i].r) {
-      asteroidBelt[i].y = canvas.width + asteroidBelt[i].r;
+    if (asteroidBelt.asteroids[i].y < 0 - asteroidBelt.asteroids[i].r) {
+      asteroidBelt.asteroids[i].y = canvas.width + asteroidBelt.asteroids[i].r;
     }
 
-    if (asteroidBelt[i].y > canvas.width + asteroidBelt[i].r) {
-      asteroidBelt[i].y = 0 - asteroidBelt[i].r;
+    if (
+      asteroidBelt.asteroids[i].y >
+      canvas.width + asteroidBelt.asteroids[i].r
+    ) {
+      asteroidBelt.asteroids[i].y = 0 - asteroidBelt.asteroids[i].r;
     }
   }
 }
