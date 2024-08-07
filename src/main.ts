@@ -14,7 +14,7 @@ import {
 } from './constants.ts';
 
 import './style.css';
-import { distBetweenPoints } from './utils.ts';
+import { distBetweenPoints, drawCurrentScore, drawHighScore } from './utils.ts';
 import { Ship, ShipInterface } from './Ship.ts';
 import { keyDown, keyUp } from './keyboard.ts';
 import { AsteroidBelt } from './AsteroidBelt.ts';
@@ -251,19 +251,8 @@ function update() {
     );
   }
 
-  // draw the score
-  context.textAlign = 'right';
-  context.textBaseline = 'middle';
-  context.fillStyle = '#000';
-  context.font = TEXT_SIZE + 'px sans-serif';
-  context.fillText(String(score), canvas.width - SHIP_SIZE / 2, SHIP_SIZE + 10);
-
-  // draw the high score
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.fillStyle = '#000';
-  context.font = TEXT_SIZE * 0.75 + 'px sans-serif';
-  context.fillText('Best ' + scoreHigh, canvas.width / 2, SHIP_SIZE + 10);
+  drawCurrentScore(canvas, context, score);
+  drawHighScore(canvas, context, scoreHigh);
 
   // detect laser hits on asteroidBelt
 
