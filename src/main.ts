@@ -419,31 +419,5 @@ function update() {
   }
 
   // move the asteroid
-  for (let i = 0; i < asteroidBelt.asteroids.length; i++) {
-    asteroidBelt.asteroids[i].x += asteroidBelt.asteroids[i].xv;
-    asteroidBelt.asteroids[i].y += asteroidBelt.asteroids[i].yv;
-
-    // handel asteroid edge of screen
-    if (asteroidBelt.asteroids[i].x < 0 - asteroidBelt.asteroids[i].r) {
-      asteroidBelt.asteroids[i].x = canvas.width + asteroidBelt.asteroids[i].r;
-    }
-
-    if (
-      asteroidBelt.asteroids[i].x >
-      canvas.width + asteroidBelt.asteroids[i].r
-    ) {
-      asteroidBelt.asteroids[i].x = 0 - asteroidBelt.asteroids[i].r;
-    }
-
-    if (asteroidBelt.asteroids[i].y < 0 - asteroidBelt.asteroids[i].r) {
-      asteroidBelt.asteroids[i].y = canvas.width + asteroidBelt.asteroids[i].r;
-    }
-
-    if (
-      asteroidBelt.asteroids[i].y >
-      canvas.width + asteroidBelt.asteroids[i].r
-    ) {
-      asteroidBelt.asteroids[i].y = 0 - asteroidBelt.asteroids[i].r;
-    }
-  }
+  asteroidBelt.moveAsteroids(canvas);
 }

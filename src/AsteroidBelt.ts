@@ -140,4 +140,28 @@ export class AsteroidBelt implements AsteroidBeltInterface {
       newLevel();
     }
   }
+
+  moveAsteroids(canvas: HTMLCanvasElement) {
+    for (let i = 0; i < this.asteroids.length; i++) {
+      this.asteroids[i].x += this.asteroids[i].xv;
+      this.asteroids[i].y += this.asteroids[i].yv;
+
+      // handel screen edges
+      if (this.asteroids[i].x < 0 - this.asteroids[i].r) {
+        this.asteroids[i].x = canvas.width + this.asteroids[i].r;
+      }
+
+      if (this.asteroids[i].x > canvas.width + this.asteroids[i].r) {
+        this.asteroids[i].x = 0 - this.asteroids[i].r;
+      }
+
+      if (this.asteroids[i].y < 0 - this.asteroids[i].r) {
+        this.asteroids[i].y = canvas.width + this.asteroids[i].r;
+      }
+
+      if (this.asteroids[i].y > canvas.width + this.asteroids[i].r) {
+        this.asteroids[i].y = 0 - this.asteroids[i].r;
+      }
+    }
+  }
 }
