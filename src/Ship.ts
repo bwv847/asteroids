@@ -1,5 +1,11 @@
 import { Laser, Thrust } from './types.ts';
-import { FRICTION, SHIP_SIZE, SHIP_THRUST } from './constants.ts';
+import {
+  FRICTION,
+  SHIP_BLINK_DUR,
+  SHIP_SIZE,
+  SHIP_THRUST,
+  SHOW_BOUNDING,
+} from './constants.ts';
 
 export type ShipInterface = {
   x: number;
@@ -26,6 +32,7 @@ export type ShipInterface = {
   shootLaser: (speed: number, quantityLimit: number) => void;
   drawExplosion: (context: CanvasRenderingContext2D) => void;
   doThrust: (context: CanvasRenderingContext2D, deltaTime: number) => void;
+  drawShip: (context: CanvasRenderingContext2D, deltaTime: number) => void;
 };
 
 export class Ship implements ShipInterface {
@@ -186,6 +193,38 @@ export class Ship implements ShipInterface {
       // apply friction (slow the ship down when not thrusting)
       this.thrust.x -= FRICTION * this.thrust.x * deltaTime;
       this.thrust.y -= FRICTION * this.thrust.y * deltaTime;
+    }
+  }
+
+  drawShip(context: CanvasRenderingContext2D, deltaTime: number) {
+    const blinkOn = this.blinkNum % 2 === 0;
+    const exploding = this.explodeTime > 0;
+
+    if (!exploding) {
+      if (blinkOn && !this.dead) {
+        this.draw(this.x, this.y, this.a, context, 'black');
+      }
+
+      // handle blinking
+      if (this.blinkNum > 0) {
+        // reduce the blink time
+        this.blinkTime--;
+
+        // reduce the blink num
+        if (this.blinkTime === 0) {
+          this.blinkTime = Math.ceil(SHIP_BLINK_DUR / deltaTime);
+          this.blinkNum--;
+        }
+      }
+    } else {
+      this.drawExplosion(context);
+    }
+
+    if (SHOW_BOUNDING) {
+      context.strokeStyle = 'lime';
+      context.beginPath();
+      context.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+      context.stroke();
     }
   }
 }

@@ -1,5 +1,4 @@
 import {
-  FRICTION,
   GAME_LIVES,
   LASER_DIST,
   LASER_EXPLODE_DUR,
@@ -8,7 +7,6 @@ import {
   SHIP_BLINK_DUR,
   SHIP_INV_DUR,
   SHIP_SIZE,
-  SHIP_THRUST,
   SHOW_BOUNDING,
   SHOW_CENTRE_DOT,
   TEXT_FADE_TIME,
@@ -125,43 +123,15 @@ function newLevel() {
 // TODO: make degrees to radians util
 
 function update() {
-  const blinkOn = ship.blinkNum % 2 === 0;
+  // const blinkOn = ship.blinkNum % 2 === 0;
   const exploding = ship.explodeTime > 0;
 
   // draw space
   context.fillStyle = 'white';
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  // thrust the ship
   ship.doThrust(context, deltaTime);
-
-  // draw the triangular ship
-  if (!exploding) {
-    if (blinkOn && !ship.dead) {
-      ship.draw(ship.x, ship.y, ship.a, context, 'black');
-    }
-
-    // handle blinking
-    if (ship.blinkNum > 0) {
-      // reduce the blink time
-      ship.blinkTime--;
-
-      // reduce the blink num
-      if (ship.blinkTime === 0) {
-        ship.blinkTime = Math.ceil(SHIP_BLINK_DUR / deltaTime);
-        ship.blinkNum--;
-      }
-    }
-  } else {
-    ship.drawExplosion(context);
-  }
-
-  if (SHOW_BOUNDING) {
-    context.strokeStyle = 'lime';
-    context.beginPath();
-    context.arc(ship.x, ship.y, ship.r, 0, Math.PI * 2, false);
-    context.stroke();
-  }
+  ship.drawShip(context, deltaTime);
 
   // draw the asteroidBelt
   let x, y, r, a, vert, offs;
