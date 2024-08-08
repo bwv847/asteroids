@@ -12,23 +12,27 @@ export function distBetweenPoints(
 export const drawHighScore = (
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
-  highScore: number
+  highScore: { value: number }
 ) => {
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillStyle = '#000';
   context.font = TEXT_SIZE * 0.75 + 'px sans-serif';
-  context.fillText('Best ' + highScore, canvas.width / 2, SHIP_SIZE + 10);
+  context.fillText('Best ' + highScore.value, canvas.width / 2, SHIP_SIZE + 10);
 };
 
 export const drawCurrentScore = (
   canvas: HTMLCanvasElement,
   context: CanvasRenderingContext2D,
-  score: number
+  score: { value: number }
 ) => {
   context.textAlign = 'right';
   context.textBaseline = 'middle';
   context.fillStyle = '#000';
   context.font = TEXT_SIZE + 'px sans-serif';
-  context.fillText(String(score), canvas.width - SHIP_SIZE / 2, SHIP_SIZE + 10);
+  context.fillText(
+    String(score.value),
+    canvas.width - SHIP_SIZE / 2,
+    SHIP_SIZE + 10
+  );
 };

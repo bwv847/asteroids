@@ -32,8 +32,8 @@ const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 let level: number;
 let lives: number;
 let asteroidBelt: AsteroidBelt;
-let score: number;
-let scoreHigh: number;
+const score: { value: number } = { value: 0 };
+const scoreHigh: { value: number } = { value: 0 };
 let ship: ShipInterface;
 let text: string;
 let textAlpha: number;
@@ -100,15 +100,15 @@ const gameOver = () => {
 function newGame() {
   level = 0;
   lives = GAME_LIVES;
-  score = 0;
+  score.value = 0;
   ship = new Ship(canvas, SHIP_SIZE, SHIP_INV_DUR, SHIP_BLINK_DUR, deltaTime);
 
   // get the high score from local storage
   const scoreStr = localStorage.getItem(SAVE_KEY_SCORE);
   if (scoreStr === null) {
-    scoreHigh = 0;
+    scoreHigh.value = 0;
   } else {
-    scoreHigh = parseInt(scoreStr);
+    scoreHigh.value = parseInt(scoreStr);
   }
 
   newLevel();
@@ -255,7 +255,6 @@ function update() {
   drawHighScore(canvas, context, scoreHigh);
 
   // detect laser hits on asteroidBelt
-
   let ax, ay, ar, lx, ly;
   for (let i = asteroidBelt.asteroids.length - 1; i >= 0; i--) {
     // grab the asteroid properties

@@ -60,8 +60,8 @@ export class AsteroidBelt implements AsteroidBeltInterface {
     index: number,
     level: number,
     deltaTime: number,
-    score: number,
-    scoreHigh: number,
+    score: { value: number },
+    scoreHigh: { value: number },
     newLevel: () => void
   ) {
     const x = this.asteroids[index].x;
@@ -94,7 +94,7 @@ export class AsteroidBelt implements AsteroidBeltInterface {
           deltaTime
         )
       );
-      score += ASTEROID_POINTS_LARGE;
+      score.value += ASTEROID_POINTS_LARGE;
     } else if (r === Math.ceil(ASTEROIDS_STARTING_SIZE / 4)) {
       this.asteroids.push(
         new Asteroid(
@@ -120,9 +120,9 @@ export class AsteroidBelt implements AsteroidBeltInterface {
           deltaTime
         )
       );
-      score += ASTEROID_POINTS_MEDIUM;
+      score.value += ASTEROID_POINTS_MEDIUM;
     } else {
-      score += ASTEROID_POINTS_SMALL;
+      score.value += ASTEROID_POINTS_SMALL;
     }
 
     // check high score
