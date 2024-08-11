@@ -27,10 +27,10 @@ export class Asteroid implements AsteroidInterface {
     speed: number,
     verticesAverage: number,
     jaggedness: number,
-    level: number,
+    level: { value: number },
     deltaTime: number
   ) {
-    const levelMultiplier = 1 + 0.1 * level;
+    const levelMultiplier = 1 + 0.1 * level.value;
 
     this.x = x;
     this.y = y;

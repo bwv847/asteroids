@@ -23,13 +23,13 @@ export class AsteroidBelt implements AsteroidBeltInterface {
   constructor(
     canvas: HTMLCanvasElement,
     ship: ShipInterface,
-    level: number,
+    level: { value: number },
     deltaTime: number
   ) {
     const asteroids = [];
 
     let x, y;
-    for (let i = 0; i < ASTEROIDS_STARTING_NUMBER + level; i++) {
+    for (let i = 0; i < ASTEROIDS_STARTING_NUMBER + level.value; i++) {
       // random asteroid location (not touching spaceship)
       do {
         x = Math.floor(Math.random() * canvas.width);
@@ -58,7 +58,7 @@ export class AsteroidBelt implements AsteroidBeltInterface {
 
   destroyAsteroid(
     index: number,
-    level: number,
+    level: { value: number },
     deltaTime: number,
     score: { value: number },
     scoreHigh: { value: number },
@@ -136,7 +136,7 @@ export class AsteroidBelt implements AsteroidBeltInterface {
 
     // new level when no more asteroidBelt
     if (this.asteroids.length === 0) {
-      level++;
+      level.value++;
       newLevel();
     }
   }

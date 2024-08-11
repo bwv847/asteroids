@@ -29,7 +29,7 @@ canvas.height = canvas.offsetHeight - 50;
 const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 // set up the game parameters
-let level: number;
+let level: { value: number };
 let lives: number;
 let asteroidBelt: AsteroidBelt;
 const score: { value: number } = { value: 0 };
@@ -98,7 +98,7 @@ const gameOver = () => {
 };
 
 function newGame() {
-  level = 0;
+  level = { value: 0 };
   lives = GAME_LIVES;
   score.value = 0;
   ship = new Ship(canvas, SHIP_SIZE, SHIP_INV_DUR, SHIP_BLINK_DUR, deltaTime);
@@ -115,7 +115,7 @@ function newGame() {
 }
 
 function newLevel() {
-  text = 'Level ' + (level + 1);
+  text = 'Level ' + (level.value + 1);
   textAlpha = 1.0;
   asteroidBelt = new AsteroidBelt(canvas, ship, level, deltaTime);
 }
